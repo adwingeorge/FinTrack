@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+from werkzeug.security import generate_password_hash
 
 def create_connection(db_file):
     conn = None
@@ -11,11 +12,13 @@ def create_connection(db_file):
     return conn
 
 def create_tables(conn):
+    drop_users_table = "DROP TABLE IF EXISTS users;"
     create_users_table = """
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE
+        email TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
     );
     """
     create_transactions_table = """
@@ -30,15 +33,17 @@ def create_tables(conn):
     """
     try:
         c = conn.cursor()
+        c.execute(drop_users_table)  # Drop the existing users table if it exists
         c.execute(create_users_table)
         c.execute(create_transactions_table)
     except Error as e:
         print(e)
-        
+
 def add_user(conn, user):
-    sql = '''INSERT INTO users(name, email) VALUES(?,?)'''
+    sql = '''INSERT INTO users(name, email, password) VALUES(?,?,?)'''
     cur = conn.cursor()
-    cur.execute(sql, user)
+    hashed_password = generate_password_hash(user['password'], method='pbkdf2:sha256')
+    cur.execute(sql, (user['name'], user['email'], hashed_password))
     conn.commit()
     return cur.lastrowid
 
