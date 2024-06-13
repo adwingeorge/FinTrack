@@ -1,0 +1,12 @@
+body {
+    padding-top: 4.5rem;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 600px;
+}
+
+.form-group label {
+    font-weight: bold;
+}
