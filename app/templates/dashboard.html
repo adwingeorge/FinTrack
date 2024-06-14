@@ -55,40 +55,212 @@
             </div>
         </div>
         <div class="row mt-3">
+            <div class="col-sm-6">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addExpenseModal">Add Expense</button>
+            </div>
+            <div class="col-sm-6 text-right">
+                <button class="btn btn-success" data-toggle="modal" data-target="#addIncomeModal">Add Income</button>
+            </div>
+        </div>
+        <div class="row mt-3">
             <div class="col-sm-12">
-                <a href="{{ url_for('add_transaction_route') }}" class="btn btn-primary">Add Transaction</a>
+                <h2>Transactions</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Amount</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction[2] }}</td>
+                            <td>{{ transaction[3] }}</td>
+                            <td>{{ transaction[4][:7] }}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editTransactionModal{{ transaction[0] }}">Edit</button>
+                                <form action="{{ url_for('delete_transaction_route', transaction_id=transaction[0]) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Transaction Modal -->
+                        <div class="modal fade" id="editTransactionModal{{ transaction[0] }}" tabindex="-1" role="dialog" aria-labelledby="editTransactionModalLabel{{ transaction[0] }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editTransactionModalLabel{{ transaction[0] }}">Edit Transaction</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <form action="{{ url_for('edit_transaction_route', transaction_id=transaction[0]) }}" method="post">
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <label for="amount">Amount:</label>
+                                                <input type="number" step="0.01" id="amount" name="amount" class="form-control" value="{{ transaction[2] }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="category">Category:</label>
+                                                <select id="category" name="category" class="form-control" required>
+                                                    <option value="Rent" {% if transaction[3] == 'Rent' %}selected{% endif %}>Rent</option>
+                                                    <option value="Groceries" {% if transaction[3] == 'Groceries' %}selected{% endif %}>Groceries</option>
+                                                    <option value="Utilities" {% if transaction[3] == 'Utilities' %}selected{% endif %}>Utilities</option>
+                                                    <option value="Entertainment" {% if transaction[3] == 'Entertainment' %}selected{% endif %}>Entertainment</option>
+                                                    <option value="Miscellaneous" {% if transaction[3] == 'Miscellaneous' %}selected{% endif %}>Miscellaneous</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="month">Month:</label>
+                                                <select id="month" name="month" class="form-control" required>
+                                                    {% for m in range(1, 13) %}
+                                                    <option value="{{ m }}" {% if m == transaction[4][:7].split('-')[1] %}selected{% endif %}>{{ m }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="year">Year:</label>
+                                                <input type="text" id="year" name="year" class="form-control" value="{{ transaction[4][:4] }}" required>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
+    <!-- Add Expense Modal -->
+    <div class="modal fade" id="addExpenseModal" tabindex="-1" role="dialog" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addExpenseModalLabel">Add Expense</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ url_for('add_expense_route') }}" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="amount">Amount:</label>
+                            <input type="number" step="0.01" id="amount" name="amount" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category:</label>
+                            <select id="category" name="category" class="form-control" required>
+                                <option value="Rent">Rent</option>
+                                <option value="Groceries">Groceries</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Miscellaneous">Miscellaneous</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="month">Month:</label>
+                            <select id="month" name="month" class="form-control" required>
+                                {% for m in range(1, 13) %}
+                                <option value="{{ m }}">{{ m }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="year">Year:</label>
+                            <input type="text" id="year" name="year" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Expense</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Income Modal -->
+    <div class="modal fade" id="addIncomeModal" tabindex="-1" role="dialog" aria-labelledby="addIncomeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addIncomeModalLabel">Add Income</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ url_for('add_income_route') }}" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="amount">Amount:</label>
+                            <input type="number" step="0.01" id="amount" name="amount" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="month">Month:</label>
+                            <select id="month" name="month" class="form-control" required>
+                                {% for m in range(1, 13) %}
+                                <option value="{{ m }}">{{ m }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="year">Year:</label>
+                            <input type="text" id="year" name="year" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Income</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        var expensesByCategory = JSON.parse('{{ expenses_by_category | tojson | safe }}');
-        console.log(expensesByCategory);
-
+        var months = JSON.parse('{{ months | tojson | safe }}');
+        var monthlyIncome = JSON.parse('{{ monthly_income | tojson | safe }}');
+        var monthlyExpenses = JSON.parse('{{ monthly_expenses | tojson | safe }}');
+        
         var ctx = document.getElementById('expenses-chart').getContext('2d');
         var expensesChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Rent', 'Groceries', 'Utilities', 'Entertainment', 'Miscellaneous'],
-                datasets: [{
-                    label: 'Expenses by Category',
-                    data: expensesByCategory,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Monthly Income',
+                        data: monthlyIncome,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Monthly Expenses',
+                        data: monthlyExpenses,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
             },
             options: {
                 scales: {
