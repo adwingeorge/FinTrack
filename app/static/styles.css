@@ -1,12 +1,57 @@
 body {
-    padding-top: 4.5rem;
+    font-family: 'Arial', sans-serif;
     background-color: #f8f9fa;
 }
 
-.container {
-    max-width: 600px;
+.navbar {
+    margin-bottom: 20px;
 }
 
-.form-group label {
+.card {
+    border-radius: 10px;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.card-body {
+    font-size: 1.2rem;
+}
+
+.table {
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.btn {
+    border-radius: 50px;
+}
+
+.modal-content {
+    border-radius: 20px;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.form-control {
+    border-radius: 10px;
+}
+
+#expenses-chart {
+    margin-top: 20px;
+}
+
+.btn-primary, .btn-success, .btn-warning, .btn-danger {
     font-weight: bold;
 }
